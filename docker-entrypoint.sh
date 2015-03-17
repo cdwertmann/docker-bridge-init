@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 set -e
 
@@ -11,7 +11,7 @@ EOF
 
 # set up master
 until mysql -h mysql -e ";" ; do
-  echo "waiting for connection to database..."
+  echo "waiting for connection to database host 'mysql'..."
   sleep 3
 done
 
@@ -22,7 +22,7 @@ EOF`
 
 # set up slave
 until mysql -h mysql_backup -e ";" ; do
-  echo "waiting for connection to database..."
+  echo "waiting for connection to database host 'mysql_backup'..."
   sleep 3
 done
 
