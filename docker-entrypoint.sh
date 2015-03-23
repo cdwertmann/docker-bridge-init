@@ -33,3 +33,5 @@ if ! mysql -h mysql_backup -e "use ESC4;"; then
   # import bridge initial DB
   wget --no-check-certificate -qO- $INITIAL_SQL_URL | mysql -h mysql ESC4
 fi
+
+exit 0
