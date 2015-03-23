@@ -22,15 +22,14 @@ if ! mysql -h mysql -e "use ESC4;"; then
   wget --no-check-certificate -qO- $INITIAL_SQL_URL | mysql -h mysql ESC4
 fi
 
-pos=`mysql -h mysql << EOF | grep mysql-bin | awk '{print $2;}'
-GRANT REPLICATION SLAVE ON *.*  TO 'repl'@'mysql-backup.novalocal.node.dc1.consul' IDENTIFIED BY '$MYSQL_SLAVE_PW';
-FLUSH TABLES WITH READ LOCK;SHOW MASTER STATUS;UNLOCK TABLES;
-EOF`
-
 # set up slave
 until mysql -h mysql_backup -e ";" ; do
   echo "waiting for connection to database host 'mysql_backup'..."
   sleep 3
 done
 
-mysql -h mysql_backup -e "CHANGE MASTER TO MASTER_HOST='mysql.novalocal.node.dc1.consul', MASTER_USER='repl',MASTER_PASSWORD='$MYSQL_SLAVE_PW',MASTER_LOG_POS=$pos;START SLAVE;"
+pos=`mysql -h mysql << EOF | grep mysql-bin | awk '{print $2;}'
+GRANT REPLICATION SLAVE ON *.*  TO 'repl'@'mysql-backup.novalocal.node.dc1.consul' IDENTIFIED BY '$MYSQL_SLAVE_PW';
+FLUSH TABLES WITH READ LOCK;SHOW MASTER STATUS;UNLOCK TABLES;
+EOF`
+mysql -h mysql_backup -e "STOP SLAVE IO_THREAD FOR CHANNEL '';CHANGE MASTER TO MASTER_HOST='mysql.novalocal.node.dc1.consul', MASTER_USER='repl',MASTER_PASSWORD='$MYSQL_SLAVE_PW',MASTER_LOG_POS=$pos;START SLAVE;"
