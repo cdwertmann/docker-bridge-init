@@ -28,7 +28,7 @@ until mysql -h mysql_backup -e ";" ; do
   sleep 3
 done
 
-pos=`mysql -h mysql <<EOF | grep mysql-bin | awk '{print $2;}'
+pos=`mysql -h mysql <<EOF | grep bin | awk '{print $2;}'
 GRANT REPLICATION SLAVE ON *.*  TO 'repl'@'mysql-backup.novalocal.node.dc1.consul' IDENTIFIED BY '$MYSQL_SLAVE_PW';
 FLUSH TABLES WITH READ LOCK;SHOW MASTER STATUS;UNLOCK TABLES;
 EOF`
