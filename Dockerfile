@@ -1,6 +1,6 @@
-FROM mysql:5.7
+FROM debian
 
-RUN apt-get update && apt-get install -y wget --no-install-recommends && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y wget mysql-client --no-install-recommends && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 COPY docker-entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
