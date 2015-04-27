@@ -18,8 +18,10 @@ done
 if ! mysql -h mysql -e "use ESC4;"; then
   # create bridge user and add permissions
   mysql -h mysql -e "CREATE DATABASE ESC4;GRANT ALL PRIVILEGES ON ESC4.* To 'esc4_rails'@'%' IDENTIFIED BY '$BRIDGEDB_PASSWORD';"
+  mysql -h mysql -e "CREATE DATABASE training_ESC4;GRANT ALL PRIVILEGES ON training_ESC4.* To 'training_rails'@'%' IDENTIFIED BY '$BRIDGEDB_PASSWORD';"
   # import bridge initial DB
   wget --no-check-certificate -qO- $INITIAL_SQL_URL | mysql -h mysql ESC4
+  wget --no-check-certificate -qO- $INITIAL_SQL_URL | mysql -h mysql training_ESC4
 fi
 
 # set up slave
