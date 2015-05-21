@@ -15,7 +15,7 @@ until mysql -h mysql -e ";" ; do
   sleep 3
 done
 
-mysql -h mysql -e "GRANT REPLICATION SLAVE ON *.*  TO 'repl'@'mysql-backup.novalocal.node.dc1.consul' IDENTIFIED BY '$MYSQL_SLAVE_PW';"
+mysql -h mysql -e "GRANT REPLICATION SLAVE ON *.*  TO 'repl'@'%' IDENTIFIED BY '$MYSQL_SLAVE_PW';"
 
 if ! mysql -h mysql -e "use ESC4;"; then
   # create bridge user and add permissions
@@ -41,5 +41,5 @@ until mysql -h mysql_backup -e ";" ; do
 done
 
 if ! mysql -h mysql_backup -e "use ESC4;"; then
-  mysql -h mysql_backup -e "CHANGE MASTER TO MASTER_HOST='mysql.novalocal.node.dc1.consul', MASTER_USER='repl',MASTER_PASSWORD='$MYSQL_SLAVE_PW',MASTER_LOG_POS=4;START SLAVE;"
+  mysql -h mysql_backup -e "CHANGE MASTER TO MASTER_HOST='mysql', MASTER_USER='repl',MASTER_PASSWORD='$MYSQL_SLAVE_PW',MASTER_LOG_POS=4;START SLAVE;"
 fi
