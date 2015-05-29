@@ -17,11 +17,6 @@ done
 
 mysql -h mysql -e "GRANT REPLICATION SLAVE ON *.*  TO 'repl'@'%' IDENTIFIED BY '$MYSQL_SLAVE_PW';"
 
-mysql -h mysql -e "REVOKE ALL PRIVILEGES ON ESC4.* FROM 'tableau'@'%';" 
-mysql -h mysql -e "REVOKE ALL PRIVILEGES ON training_ESC4.* FROM 'tableau'@'%';"
-mysql -h mysql -e "GRANT SELECT ON ESC4.* To 'tableau'@'%' IDENTIFIED BY '$TABLEAUDB_PASSWORD';" 
-mysql -h mysql -e "GRANT SELECT ON training_ESC4.* To 'tableau'@'%' IDENTIFIED BY '$TABLEAUDB_PASSWORD';"
-
 if ! mysql -h mysql -e "use ESC4;"; then
   # create bridge user and add permissions
   mysql -h mysql -e "CREATE DATABASE ESC4;GRANT ALL PRIVILEGES ON ESC4.* To 'esc4_rails'@'%' IDENTIFIED BY '$BRIDGEDB_PASSWORD';"
