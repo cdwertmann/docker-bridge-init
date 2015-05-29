@@ -16,8 +16,6 @@ until mysql -h mysql -e ";" ; do
 done
 
 mysql -h mysql -e "GRANT REPLICATION SLAVE ON *.*  TO 'repl'@'%' IDENTIFIED BY '$MYSQL_SLAVE_PW';"
-mysql -h mysql -e "GRANT ALL PRIVILEGES ON ESC4.* To 'tableau'@'%' IDENTIFIED BY '$TABLEAUDB_PASSWORD';"
-mysql -h mysql -e "GRANT ALL PRIVILEGES ON training_ESC4.* To 'tableau'@'%' IDENTIFIED BY '$TABLEAUDB_PASSWORD';"
 
 if ! mysql -h mysql -e "use ESC4;"; then
   # create bridge user and add permissions
