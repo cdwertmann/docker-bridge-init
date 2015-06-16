@@ -43,5 +43,5 @@ until mysql -h mysql_backup -e ";" ; do
 done
 
 if ! mysql -h mysql_backup -e "use ESC4;"; then
-  mysql -h mysql_backup -e "STOP SLAVE;CHANGE MASTER TO MASTER_HOST='mysql', MASTER_USER='repl',MASTER_PASSWORD='$MYSQL_SLAVE_PW',MASTER_LOG_POS=4;START SLAVE;"
+  mysql -h mysql_backup -e "STOP SLAVE;CHANGE MASTER TO MASTER_HOST='mysql', MASTER_USER='repl',MASTER_PASSWORD='$MYSQL_SLAVE_PW',MASTER_LOG_FILE='master-bin.000001',MASTER_LOG_POS=4;START SLAVE;"
 fi
