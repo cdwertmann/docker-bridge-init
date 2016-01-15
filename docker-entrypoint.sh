@@ -1,39 +1,33 @@
 #!/bin/bash -x
-
 set -e
 
-cat > ~/.my.cnf <<EOF
-[client]
-user=root
-password=$MYSQL_ROOT_PW
-protocol=tcp
-EOF
-
 # set up master
-until mysql -h mysql -e ";" ; do
+until mysql -e ";" ; do
   echo "waiting for connection to database host 'mysql'..."
   sleep 3
 done
 
-mysql -h mysql -e "GRANT REPLICATION SLAVE ON *.*  TO 'repl'@'%' IDENTIFIED BY '$MYSQL_SLAVE_PW';"
+mysql -e "GRANT REPLICATION SLAVE ON *.*  TO 'repl'@'%' IDENTIFIED BY '$MYSQL_SLAVE_PW';"
 
-if ! mysql -h mysql -e "use ESC4;"; then
+if ! mysql -e "use ESC4;"; then
   # create bridge user and add permissions
-  mysql -h mysql -e "CREATE DATABASE ESC4;GRANT ALL PRIVILEGES ON ESC4.* To 'esc4_rails'@'%' IDENTIFIED BY '$BRIDGEDB_PASSWORD';"
-  mysql -h mysql -e "SELECT CONCAT(\"GRANT SELECT ON ESC4.\", table_name, \" TO tableau@'%' IDENTIFIED BY '$TABLEAUDB_PASSWORD';\") FROM information_schema.TABLES WHERE table_schema = \"ESC4\" AND table_name <> \"jobs\" AND table_name <> \"old_jobs\";"
+  mysql -N -s -r -e "CREATE DATABASE ESC4;GRANT ALL PRIVILEGES ON ESC4.* To 'esc4_rails'@'%' IDENTIFIED BY '$BRIDGEDB_PASSWORD';" > /tmp/sql
+  mysql -N -s -r -e "SELECT CONCAT(\"GRANT SELECT ON ESC4.\", table_name, \" TO tableau@'%' IDENTIFIED BY '$TABLEAUDB_PASSWORD';\") FROM information_schema.TABLES WHERE table_schema = \"ESC4\" AND table_name <> \"jobs\" AND table_name <> \"old_jobs\";" >> /tmp/sql
+  mysql < /tmp/sql
   # import bridge initial DB
   wget --no-check-certificate -qO import.sql $INITIAL_SQL_URL
-  mysql -h mysql ESC4 < import.sql
+  mysql ESC4 < import.sql
 fi
 
-if ! mysql -h mysql -e "use training_ESC4;"; then
+if ! mysql -e "use training_ESC4;"; then
   # create bridge user and add permissions
-  mysql -h mysql -e "CREATE DATABASE training_ESC4;GRANT ALL PRIVILEGES ON training_ESC4.* To 'training_rails'@'%' IDENTIFIED BY '$BRIDGEDB_TRAINING_PASSWORD';"
-  mysql -h mysql -e "GRANT ALL PRIVILEGES ON training_ESC4.* To 'esc4_rails'@'%' IDENTIFIED BY '$BRIDGEDB_PASSWORD';"
-  mysql -h mysql -e "SELECT CONCAT(\"GRANT SELECT ON training_ESC4.\", table_name, \" TO tableau@'%' IDENTIFIED BY '$TABLEAUDB_PASSWORD';\") FROM information_schema.TABLES WHERE table_schema = \"training_ESC4\" AND table_name <> \"jobs\" AND table_name <> \"old_jobs\";"
+  mysql -e "CREATE DATABASE training_ESC4;GRANT ALL PRIVILEGES ON training_ESC4.* To 'training_rails'@'%' IDENTIFIED BY '$BRIDGEDB_TRAINING_PASSWORD';"
+  mysql -N -s -r -e "GRANT ALL PRIVILEGES ON training_ESC4.* To 'esc4_rails'@'%' IDENTIFIED BY '$BRIDGEDB_PASSWORD';" > /tmp/sql
+  mysql -N -s -r -e "SELECT CONCAT(\"GRANT SELECT ON training_ESC4.\", table_name, \" TO tableau@'%' IDENTIFIED BY '$TABLEAUDB_PASSWORD';\") FROM information_schema.TABLES WHERE table_schema = \"training_ESC4\" AND table_name <> \"jobs\" AND table_name <> \"old_jobs\";" >> /tmp/sql
+  mysql < /tmp/sql
   # import bridge initial DB
   wget --no-check-certificate -qO import.sql $INITIAL_SQL_URL
-  mysql -h mysql training_ESC4 < import.sql
+  mysql training_ESC4 < import.sql
 fi
 
 # set up slave
