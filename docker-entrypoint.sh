@@ -40,8 +40,10 @@ until mysql -h mysql_backup -e ";" ; do
   sleep 3
 done
 
+set +e
+
 if ! mysql -h $MYSQL_SLAVE_HOST -e "use ESC4;"; then
   mysql -h $MYSQL_SLAVE_HOST -e "STOP SLAVE;CHANGE MASTER TO MASTER_HOST='mysql', MASTER_USER='repl',MASTER_PASSWORD='$MYSQL_SLAVE_PW',MASTER_LOG_FILE='master-bin.000001',MASTER_LOG_POS=4;START SLAVE;"
   mysql -e "RESET MASTER;"
-  mysql -h $MYSQL_SLAVE_HOST -e "STOP SLAVE;RESET MASTER;RESET SLAVE;START SLAVE;"
+  mysql -h $MYSQL_SLAVE_HOST -e "STOP SLAVE;RESET SLAVE;START SLAVE;"
 fi
